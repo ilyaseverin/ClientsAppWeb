@@ -92,6 +92,7 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 // Хук для удобного доступа к контексту
+// eslint-disable-next-line react-refresh/only-export-components
 export const useClients = (): ClientsContextType => {
   const context = useContext(ClientsContext);
   if (!context) {

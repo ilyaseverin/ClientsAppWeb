@@ -35,7 +35,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   if (currentPath.startsWith("/add-client")) value = 2;
   if (currentPath.startsWith("/search-client")) value = 3;
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     switch (newValue) {
       case 0:
         navigate("/home");

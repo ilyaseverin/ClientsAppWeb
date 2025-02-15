@@ -6,7 +6,7 @@ import {
 } from "./formatClientsForGoogleSheet";
 
 const URL =
-  "1https://script.google.com/macros/s/AKfycbxm-T6DXhskMjib5Wu36aUsJa4R7U5ZokPQLl7wAdAUAbgkwtJuutE6SSrZpE5pv0V1/exec";
+  "https://script.google.com/macros/s/AKfycbxm-T6DXhskMjib5Wu36aUsJa4R7U5ZokPQLl7wAdAUAbgkwtJuutE6SSrZpE5pv0V1/exec";
 
 export async function syncClientsWithGoogleSheet(clients: Client[]) {
   try {
