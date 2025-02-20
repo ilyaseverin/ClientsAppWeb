@@ -1,4 +1,3 @@
-// src/utils/fieldGroups.ts
 export const fieldGroups = [
   {
     groupTitle: "Личные данные клиента",

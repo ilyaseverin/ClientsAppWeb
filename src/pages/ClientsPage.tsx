@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/pages/ClientsScreen.tsx
+// src/pages/ClientsPage.tsx
+
 import React, { useState, useEffect } from "react";
 import {
-  Box,
   Typography,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
   Paper,
+  Container,
 } from "@mui/material";
+import { useSearchParams } from "react-router-dom"; // <-- для работы с query
 import { useClients } from "../contexts/ClientsContext";
-import { RenderClientsForDate } from "../components/renderClientsForDate"; // см. ниже
-// Если хотите добавить логику логаута, сделайте свою кнопку / иконку
+import { RenderClientsForDate } from "../components/renderClientsForDate";
 
 export const ClientsPage: React.FC = () => {
   const { clients } = useClients();
@@ -20,26 +21,38 @@ export const ClientsPage: React.FC = () => {
   const [filteredClients, setFilteredClients] = useState<Record<string, any[]>>(
     {}
   );
-  const [selectedMonth, setSelectedMonth] = useState<string>("");
+
+  // Подготовим state для выбранного месяца
+  // Но инициализируем его из query-параметра:
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialMonth = searchParams.get("month") || "";
+  const [selectedMonth, setSelectedMonth] = useState<string>(initialMonth);
+
   const [dropdownItems, setDropdownItems] = useState<any[]>([]);
 
-  // При изменении списка клиентов — рассчитываем месяцы
+  // При изменении списка клиентов — пересчитываем месяцы
   useEffect(() => {
     if (clients.length) {
       calculateMonthlyCounts(clients);
     }
   }, [clients]);
 
-  // При выборе месяца — фильтруем
+  // При изменении selectedMonth — сохраняем в URL и фильтруем
   useEffect(() => {
     if (selectedMonth) {
+      // Устанавливаем ?month=selectedMonth
+      searchParams.set("month", selectedMonth);
+      setSearchParams(searchParams);
       filterClientsByMonth(clients, selectedMonth);
     } else {
+      // Если пользователь очистил фильтр
+      searchParams.delete("month");
+      setSearchParams(searchParams);
       setFilteredClients({});
     }
   }, [selectedMonth, clients]);
 
-  // Считаем, сколько клиентов на каждый месяц
+  // Считаем, сколько клиентов на каждый месяц (для выпадающего списка)
   const calculateMonthlyCounts = (clientsData: any[]) => {
     const counts: Record<string, number> = {};
 
@@ -89,7 +102,7 @@ export const ClientsPage: React.FC = () => {
       }
     });
 
-    // Сортируем ключи (даты)
+    // Сортируем даты по возрастанию
     const sorted = Object.keys(groupedClients)
       .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
       .reduce<Record<string, any[]>>((acc, date) => {
@@ -101,7 +114,7 @@ export const ClientsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Container sx={{ my: 4 }}>
       <Typography variant="h4" gutterBottom>
         Клиенты
       </Typography>
@@ -130,6 +143,6 @@ export const ClientsPage: React.FC = () => {
           <RenderClientsForDate date={date} clients={group} />
         </Paper>
       ))}
-    </Box>
+    </Container>
   );
 };

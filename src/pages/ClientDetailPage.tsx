@@ -12,6 +12,8 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Paper,
+  Stack,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
@@ -223,16 +225,38 @@ export const ClientDetailPage: React.FC = () => {
   }
 
   return (
-    <Container sx={{ mt: 3 }}>
+     <Container sx={{my:4}}>
       <Typography variant="h4" gutterBottom>
         Данные клиента
       </Typography>
 
       {fieldGroups.map((group) => (
-        <Box key={group.groupTitle} mb={3}>
-          <Typography variant="h6" sx={{ mb: 1 }}>
+        <Paper
+          key={group.groupTitle}
+          elevation={2}
+          sx={{
+            p: 2,
+            mb: 3,
+            borderRadius: 2,
+            bgcolor: (theme) =>
+              theme.palette.mode === "light" ? "#fafafa" : "inherit",
+          }}
+        >
+          {/* Название группы — фиолетовое в темной теме, основной цвет в светлой */}
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{
+              fontWeight: "bold",
+              color: (theme) =>
+                theme.palette.mode === "dark"
+                  ? theme.palette.primary.main // фиолетовый для темной темы
+                  : theme.palette.primary.main, // "основной" цвет в светлой теме
+            }}
+          >
             {group.groupTitle}
           </Typography>
+
           <Grid container spacing={2}>
             {group.fields.map(({ key, label }) => {
               const value = clientData[key] || "";
@@ -241,13 +265,28 @@ export const ClientDetailPage: React.FC = () => {
                 if (key.includes("Дата")) {
                   return (
                     <Grid item xs={12} sm={6} md={4} key={key}>
+                      {/* Название поля (сероватое в темной теме, более темное в светлой) */}
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          mb: 0.5,
+                          fontWeight: "bold",
+                          color: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? theme.palette.grey[300]
+                              : theme.palette.grey[700],
+                        }}
+                      >
+                        {label}
+                      </Typography>
+
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                          label={label}
+                          label=""
                           // Преобразуем строку в dayjs; если значение пустое — null
                           value={value ? dayjs(value, "YYYY-MM-DD") : null}
                           onChange={(newValue) => {
-                            // При выборе даты сразу сохраняем в формате "YYYY-MM-DD"
+                            // При выборе даты сохраняем в формате "YYYY-MM-DD"
                             const formatted = newValue
                               ? newValue.format("YYYY-MM-DD")
                               : "";
@@ -256,7 +295,9 @@ export const ClientDetailPage: React.FC = () => {
                           slotProps={{
                             textField: {
                               fullWidth: true,
-                              label,
+                              size: "small",
+                              // Цвет полей на усмотрение, здесь используем стандартные MUI
+                              // либо можно задать backgroundColor, если хотим
                             },
                           }}
                         />
@@ -267,8 +308,24 @@ export const ClientDetailPage: React.FC = () => {
                   // Обычное текстовое поле для остальных
                   return (
                     <Grid item xs={12} sm={6} md={4} key={key}>
+                      {/* Название поля */}
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          mb: 0.5,
+                          fontWeight: "bold",
+                          color: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? theme.palette.grey[400]
+                              : theme.palette.grey[700],
+                        }}
+                      >
+                        {label}
+                      </Typography>
+
                       <TextField
-                        label={label}
+                        label=""
+                        size="small"
                         fullWidth
                         value={value}
                         onChange={(e) => handleFieldChange(key, e.target.value)}
@@ -277,19 +334,45 @@ export const ClientDetailPage: React.FC = () => {
                   );
                 }
               } else {
+                // Режим просмотра (не редактирования)
                 return (
                   <Grid item xs={12} sm={6} md={4} key={key}>
-                    <Typography variant="subtitle2">{label}:</Typography>
-                    <Typography>{value || "N/A"}</Typography>
+                    {/* Название поля */}
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? theme.palette.grey[400]
+                            : theme.palette.grey[700],
+                      }}
+                    >
+                      {label}
+                    </Typography>
+
+                    {/* Значение поля — с небольшим отступом слева */}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        ml: 1,
+                        color: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? theme.palette.common.white
+                            : theme.palette.text.primary,
+                      }}
+                    >
+                      {value || "—"}
+                    </Typography>
                   </Grid>
                 );
               }
             })}
           </Grid>
-        </Box>
+        </Paper>
       ))}
 
-      <Box display="flex" gap={2} mt={2}>
+      <Stack direction="row" spacing={2}>
         {isEditing ? (
           <>
             <Button variant="contained" color="primary" onClick={handleSave}>
@@ -309,7 +392,7 @@ export const ClientDetailPage: React.FC = () => {
             </Button>
           </>
         )}
-      </Box>
+      </Stack>
 
       {/* Диалог подтверждения удаления */}
       <Dialog open={deleteConfirm} onClose={() => setDeleteConfirm(false)}>

@@ -1,4 +1,3 @@
-// src/utils/googleSheets.ts
 import { Client } from "../contexts/ClientsContext";
 import {
   formatClientsForGoogleSheet,
@@ -11,10 +10,15 @@ const URL =
 export async function syncClientsWithGoogleSheet(clients: Client[]) {
   try {
     const formattedClients = formatClientsForGoogleSheet(clients);
+
+    // Вместо application/json → ставим text/plain
+    // Плюс добавляем redirect: "follow"
     const response = await fetch(URL, {
       method: "POST",
+      redirect: "follow",
       headers: {
-        "Content-Type": "application/json",
+        // Ключевой момент: text/plain → браузер не делает preflight
+        "Content-Type": "text/plain;charset=utf-8",
       },
       body: JSON.stringify({
         action: "sync",
@@ -22,6 +26,7 @@ export async function syncClientsWithGoogleSheet(clients: Client[]) {
         values: formattedClients,
       }),
     });
+
     const result = await response.json();
     if (result.status === "success") {
       console.log("Данные успешно синхронизированы с Google Таблицей");

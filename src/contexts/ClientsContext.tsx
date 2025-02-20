@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// src/context/ClientsContext.tsx
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig"; // <-- поправьте путь на ваш
-import { syncClientsWithGoogleSheet } from "../utils/googleSheets"; // <-- поправьте путь на ваш
+import { db } from "../firebase/firebaseConfig";
+import { syncClientsWithGoogleSheet } from "../utils/googleSheets";
 
 // Тип данных клиента
 export interface Client {
@@ -92,7 +90,6 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 // Хук для удобного доступа к контексту
-// eslint-disable-next-line react-refresh/only-export-components
 export const useClients = (): ClientsContextType => {
   const context = useContext(ClientsContext);
   if (!context) {

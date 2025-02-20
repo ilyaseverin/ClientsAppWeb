@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/HomeScreen.tsx
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Paper } from "@mui/material";
+import { Typography, Paper, Container } from "@mui/material";
 import { useClients } from "../contexts/ClientsContext";
 import { RenderClientsForDate } from "../components/renderClientsForDate";
 
@@ -44,7 +44,8 @@ export const HomePage: React.FC = () => {
         const finalDate = new Date(targetYear, targetMonth, targetDay);
 
         if (finalDate >= today && finalDate <= nextWeek) {
-          const formattedDate = finalDate.toISOString().split("T")[0];
+          const formattedDate = finalDate.toLocaleDateString("en-CA");
+
           if (!grouped[formattedDate]) {
             grouped[formattedDate] = [];
           }
@@ -57,7 +58,7 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Container sx={{ my: 4 }}>
       <Typography variant="h4" gutterBottom>
         Клиенты на ближайшие 7 дней
       </Typography>
@@ -71,6 +72,6 @@ export const HomePage: React.FC = () => {
           </Paper>
         ))
       )}
-    </Box>
+    </Container>
   );
 };

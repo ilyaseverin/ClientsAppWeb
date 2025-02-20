@@ -1,90 +1,92 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/pages/SearchClientPage.tsx
-import { useClients } from "../contexts/ClientsContext";
-import {
-  Box,
-  TextField,
-  Typography,
-  Card,
-  CardContent,
-  List,
-  ListItem,
-  ListItemButton,
-} from "@mui/material";
-import { useState } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { Box, Container, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useClients } from "../contexts/ClientsContext";
+import { ClientCard } from "../components/ClientCard";
+import { useDebounce } from "../hooks/useDebounce";
 
 export default function SearchClientPage() {
   const { clients } = useClients();
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [filtered, setFiltered] = useState<any[]>([]);
+  const debouncedQuery = useDebounce(searchQuery, 500);
 
-  // простой вариант debounce:
-  const [timer, setTimer] = useState<any>(null);
-
-  const handleChange = (value: string) => {
-    setSearchQuery(value);
-    if (timer) clearTimeout(timer);
-
-    const newTimer = setTimeout(() => {
-      performSearch(value);
-    }, 500);
-
-    setTimer(newTimer);
-  };
-
-  const performSearch = (query: string) => {
-    if (!query.trim()) {
-      setFiltered([]);
-      return;
-    }
-    const lower = query.toLowerCase();
-    const result = clients.filter((c) =>
-      Object.values(c).some((val) => String(val).toLowerCase().includes(lower))
+  // Мемоизированная фильтрация списка клиентов
+  const filtered = useMemo(() => {
+    if (debouncedQuery.trim().length < 3) return [];
+    const lower = debouncedQuery.toLowerCase();
+    return clients.filter((client) =>
+      Object.values(client).some((val) =>
+        String(val).toLowerCase().includes(lower)
+      )
     );
-    setFiltered(result);
-  };
+  }, [debouncedQuery, clients]);
+
+  // Состояние для количества отображаемых элементов
+  const [visibleCount, setVisibleCount] = useState(10);
+
+  // Если изменился фильтр, сбрасываем visibleCount
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [filtered]);
+
+  // IntersectionObserver для подгрузки новых элементов
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && visibleCount < filtered.length) {
+          // Добавляем еще 20 элементов, или до конца списка
+          setVisibleCount((prev) => Math.min(prev + 10, filtered.length));
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [filtered, visibleCount]
+  );
 
   return (
-    <Box>
+    <Container sx={{ my: 4 }}>
       <Typography variant="h5" gutterBottom>
         Поиск клиентов
       </Typography>
 
       <TextField
         label="Введите текст для поиска"
+        variant="outlined"
         fullWidth
         value={searchQuery}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(e) => setSearchQuery(e.target.value)}
         sx={{ mb: 2 }}
       />
 
       {!searchQuery.trim() ? (
-        <Typography>Начните вводить текст...</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Начните вводить текст для поиска...
+        </Typography>
       ) : filtered.length > 0 ? (
-        <List>
-          {filtered.map((client) => (
-            <ListItem key={client.id} disablePadding>
-              <ListItemButton onClick={() => navigate(`/client/${client.id}`)}>
-                <Card sx={{ width: "100%" }}>
-                  <CardContent>
-                    <Typography variant="h6">
-                      {client["ФИО"] || "Без имени"}
-                    </Typography>
-                    <Typography variant="body2">
-                      {client["Телефон"] || ""}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </ListItemButton>
-            </ListItem>
+        <>
+          {filtered.slice(0, visibleCount).map((client) => (
+            <Box key={client.id} sx={{ mb: 2 }}>
+              <ClientCard
+                client={client}
+                onClick={() => navigate(`/client-detail/${client.id}`)}
+              />
+            </Box>
           ))}
-        </List>
+          {/* Элемент для наблюдения за прокруткой */}
+          <div ref={loadMoreRef} />
+        </>
       ) : (
-        <Typography>Ничего не найдено</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Ничего не найдено
+        </Typography>
       )}
-    </Box>
+    </Container>
   );
 }

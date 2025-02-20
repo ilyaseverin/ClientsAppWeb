@@ -1,5 +1,3 @@
-// src/utils/formatClientsForGoogleSheet.ts
-
 import { Client } from "../contexts/ClientsContext";
 
 // Заголовки

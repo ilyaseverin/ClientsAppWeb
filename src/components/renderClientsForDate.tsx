@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, Typography } from "@mui/material";
+import React from "react";
+import { Box, Typography, Stack, useTheme } from "@mui/material";
 import { ClientCard } from "./ClientCard";
 import { useNavigate } from "react-router-dom";
 
@@ -13,10 +14,18 @@ export const RenderClientsForDate: React.FC<RenderClientsForDateProps> = ({
   clients,
 }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+    <Box>
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: "bold",
+          mb: 2,
+          color:theme.palette.primary.main
+        }}
+      >
         {new Date(date).toLocaleDateString("ru-RU", {
           weekday: "short",
           day: "numeric",
@@ -24,13 +33,15 @@ export const RenderClientsForDate: React.FC<RenderClientsForDateProps> = ({
         })}
       </Typography>
 
-      {clients.map((client) => (
-        <ClientCard
-          key={client.id}
-          client={client}
-          onClick={() => navigate(`/client-detail/${client.id}`)}
-        />
-      ))}
+      <Stack spacing={2}>
+        {clients.map((client) => (
+          <ClientCard
+            key={client.id}
+            client={client}
+            onClick={() => navigate(`/client-detail/${client.id}`)}
+          />
+        ))}
+      </Stack>
     </Box>
   );
 };

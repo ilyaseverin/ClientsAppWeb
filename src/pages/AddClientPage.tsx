@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import {
+  Container,
+  Paper,
   Box,
   Typography,
   Grid,
@@ -10,6 +12,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Stack,
 } from "@mui/material";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -97,27 +100,53 @@ export const AddClientPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 2, maxWidth: 800, margin: "0 auto" }}>
+    <Container sx={{my:4}}>
       <Typography variant="h4" gutterBottom>
         Добавить клиента
       </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
-        sx={{ mt: 2 }}
-      >
+      {/* Форма добавления клиента */}
+      <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         {fieldGroups.map((group) => (
-          <Box key={group.groupTitle} sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+          <Paper
+            key={group.groupTitle}
+            elevation={2}
+            sx={{
+              p: 2,
+              mb: 3,
+              borderRadius: 2,
+              bgcolor: (theme) =>
+                theme.palette.mode === "light" ? "#fafafa" : "inherit",
+            }}
+          >
+            <Typography
+                        variant="h6"
+                        gutterBottom
+                        sx={{
+                          fontWeight: "bold",
+                          color: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? theme.palette.primary.main // фиолетовый для темной темы
+                              : theme.palette.primary.main, // "основной" цвет в светлой теме
+                        }}
+                      >
               {group.groupTitle}
             </Typography>
 
             <Grid container spacing={2}>
               {group.fields.map(({ key, label }) => (
-                <Grid item xs={12} sm={6} key={key}>
-                  <Typography variant="body2" sx={{ mb: 0.5 }}>
+                <Grid item xs={12} sm={6} md={4} key={key}>
+                  <Typography
+                                        variant="subtitle1"
+                                        sx={{
+                                          fontWeight: "bold",
+                                          mb:0.5,
+                                          color: (theme) =>
+                                            theme.palette.mode === "dark"
+                                              ? theme.palette.grey[400]
+                                              : theme.palette.grey[700],
+                                        }}
+                                      >
                     {label}
                   </Typography>
 
@@ -125,23 +154,23 @@ export const AddClientPage: React.FC = () => {
                     control={control}
                     name={key}
                     render={({ field: { onChange, value } }) => {
+                      // Поле с датой
                       if (key.includes("Дата")) {
                         return (
                           <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
-                              label={label}
-                              // Преобразуем строку в Dayjs для отображения
+                              label=""
                               value={value ? dayjs(value, "YYYY-MM-DD") : null}
                               onChange={(newValue) => {
-                                // Сразу преобразовываем в строку "YYYY-MM-DD"
-                                onChange(
-                                  newValue ? newValue.format("YYYY-MM-DD") : ""
-                                );
+                                const formatted = newValue
+                                  ? newValue.format("YYYY-MM-DD")
+                                  : "";
+                                onChange(formatted);
                               }}
                               slotProps={{
                                 textField: {
                                   fullWidth: true,
-                                  label,
+                                  size: "small",
                                   error: !!errors[key],
                                   helperText: errors[key]?.message as string,
                                 },
@@ -150,9 +179,12 @@ export const AddClientPage: React.FC = () => {
                           </LocalizationProvider>
                         );
                       }
+
+                      // Обычное текстовое поле
                       return (
                         <TextField
                           fullWidth
+                          size="small"
                           placeholder={`Введите ${label}`}
                           value={value || ""}
                           onChange={(e) => onChange(e.target.value)}
@@ -165,16 +197,17 @@ export const AddClientPage: React.FC = () => {
                 </Grid>
               ))}
             </Grid>
-          </Box>
+          </Paper>
         ))}
 
-        <Box mt={3}>
-          <Button variant="contained" type="submit">
+        <Stack direction="row" spacing={2}>
+          <Button variant="contained" type="submit" color="primary">
             Добавить клиента
           </Button>
-        </Box>
+        </Stack>
       </Box>
 
+      {/* Диалог с результатом */}
       <Dialog open={dialogOpen} onClose={closeDialog}>
         <DialogTitle>{dialogTitle}</DialogTitle>
         <DialogContent>
@@ -184,6 +217,6 @@ export const AddClientPage: React.FC = () => {
           <Button onClick={closeDialog}>OK</Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
