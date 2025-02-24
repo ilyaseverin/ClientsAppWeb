@@ -396,8 +396,10 @@ export const ClientDetailPage: React.FC = () => {
           <Typography>Вы уверены, что хотите удалить этого клиента?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteConfirm(false)}>Отмена</Button>
-          <Button color="error" onClick={confirmDelete}>
+          <Button variant="contained" onClick={() => setDeleteConfirm(false)}>
+            Отмена
+          </Button>
+          <Button color="error" variant="contained" onClick={confirmDelete}>
             Удалить
           </Button>
         </DialogActions>
@@ -410,7 +412,9 @@ export const ClientDetailPage: React.FC = () => {
           <Typography>{errorDialog.message}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseErrorDialog}>OK</Button>
+          <Button variant="contained" onClick={handleCloseErrorDialog}>
+            OK
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -421,7 +425,9 @@ export const ClientDetailPage: React.FC = () => {
           <Typography>{successDialog.message}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseSuccessDialog}>OK</Button>
+          <Button variant="contained" onClick={handleCloseSuccessDialog}>
+            OK
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

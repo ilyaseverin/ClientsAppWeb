@@ -100,7 +100,7 @@ export const AddClientPage: React.FC = () => {
   };
 
   return (
-    <Container sx={{my:4}}>
+    <Container sx={{ my: 4 }}>
       <Typography variant="h4" gutterBottom>
         Добавить клиента
       </Typography>
@@ -120,16 +120,16 @@ export const AddClientPage: React.FC = () => {
             }}
           >
             <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{
-                          fontWeight: "bold",
-                          color: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? theme.palette.primary.main // фиолетовый для темной темы
-                              : theme.palette.primary.main, // "основной" цвет в светлой теме
-                        }}
-                      >
+              variant="h6"
+              gutterBottom
+              sx={{
+                fontWeight: "bold",
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? theme.palette.primary.main // фиолетовый для темной темы
+                    : theme.palette.primary.main, // "основной" цвет в светлой теме
+              }}
+            >
               {group.groupTitle}
             </Typography>
 
@@ -137,16 +137,16 @@ export const AddClientPage: React.FC = () => {
               {group.fields.map(({ key, label }) => (
                 <Grid item xs={12} sm={6} md={4} key={key}>
                   <Typography
-                                        variant="subtitle1"
-                                        sx={{
-                                          fontWeight: "bold",
-                                          mb:0.5,
-                                          color: (theme) =>
-                                            theme.palette.mode === "dark"
-                                              ? theme.palette.grey[400]
-                                              : theme.palette.grey[700],
-                                        }}
-                                      >
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: "bold",
+                      mb: 0.5,
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.grey[400]
+                          : theme.palette.grey[700],
+                    }}
+                  >
                     {label}
                   </Typography>
 
@@ -214,7 +214,9 @@ export const AddClientPage: React.FC = () => {
           <Typography>{dialogMessage}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDialog}>OK</Button>
+          <Button variant="contained" onClick={closeDialog}>
+            OK
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
