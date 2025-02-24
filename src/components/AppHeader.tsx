@@ -98,8 +98,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
    */
   const isActiveHome = currentPath.startsWith("/home");
   // "Клиенты" считаем активными, если мы либо на /clients, либо на /client-detail
-  const isActiveClients =
-    currentPath.startsWith("/clients") || isClientDetail;
+  const isActiveClients = currentPath.startsWith("/clients") || isClientDetail;
   const isActiveAddClient = currentPath.startsWith("/add-client");
   const isActiveSearch = currentPath.startsWith("/search-client");
 
@@ -132,7 +131,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <List>
         {/* Главная */}
         <ListItem disablePadding>
-          <ListItemButton selected={isActiveHome} onClick={() => navigate("/home")}>
+          <ListItemButton
+            selected={isActiveHome}
+            onClick={() => navigate("/home")}
+          >
             <ListItemText primary="Главная" />
           </ListItemButton>
         </ListItem>
@@ -253,11 +255,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   <LogoutIcon />
                 </IconButton>
               ) : (
-                <IconButton
-                  color="inherit"
-                  onClick={handleLogin}
-                  title="Войти"
-                >
+                <IconButton color="inherit" onClick={handleLogin} title="Войти">
                   <LoginIcon />
                 </IconButton>
               )}

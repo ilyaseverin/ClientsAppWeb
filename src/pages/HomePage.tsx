@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Typography, Paper, Container } from "@mui/material";
 import { useClients } from "../contexts/ClientsContext";
 import { RenderClientsForDate } from "../components/renderClientsForDate";
+import { calculateUpcomingClients } from "../utils/clientsUtils";
 
 export const HomePage: React.FC = () => {
   const { clients } = useClients();
@@ -13,49 +14,10 @@ export const HomePage: React.FC = () => {
 
   useEffect(() => {
     if (clients.length > 0) {
-      calculateUpcomingClients(clients);
+      const grouped = calculateUpcomingClients(clients);
+      setUpcomingClients(grouped);
     }
   }, [clients]);
-
-  const calculateUpcomingClients = (clientsData: any[]) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const nextWeek = new Date();
-    nextWeek.setDate(today.getDate() + 7);
-
-    const grouped: Record<string, any[]> = {};
-
-    clientsData.forEach((client) => {
-      const dateStr = client["Дата планируемого ТО"] || client["Дата ТО"];
-      if (dateStr) {
-        const dateObj = new Date(dateStr);
-        dateObj.setHours(0, 0, 0, 0);
-
-        // Логика вычисления "следующий год", если дата уже прошла
-        const targetMonth = dateObj.getMonth();
-        const targetDay = dateObj.getDate();
-        let targetYear = today.getFullYear();
-
-        const adjustedDate = new Date(targetYear, targetMonth, targetDay);
-        if (adjustedDate < today) {
-          targetYear += 1;
-        }
-        const finalDate = new Date(targetYear, targetMonth, targetDay);
-
-        if (finalDate >= today && finalDate <= nextWeek) {
-          const formattedDate = finalDate.toLocaleDateString("en-CA");
-
-          if (!grouped[formattedDate]) {
-            grouped[formattedDate] = [];
-          }
-          grouped[formattedDate].push(client);
-        }
-      }
-    });
-
-    setUpcomingClients(grouped);
-  };
 
   return (
     <Container sx={{ my: 4 }}>

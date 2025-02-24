@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Container,
-  Box,
   Typography,
   Grid,
   TextField,
@@ -11,7 +10,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  CircularProgress,
   Paper,
   Stack,
 } from "@mui/material";
@@ -26,6 +24,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import Loader from "../components/Loader";
 
 // Проверка, что дата в формате YYYY-MM-DD реальная
 function isRealDate(value: string) {
@@ -207,11 +206,7 @@ export const ClientDetailPage: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" mt={4}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Loader />;
   }
 
   if (!clientData) {
@@ -225,7 +220,7 @@ export const ClientDetailPage: React.FC = () => {
   }
 
   return (
-     <Container sx={{my:4}}>
+    <Container sx={{ my: 4 }}>
       <Typography variant="h4" gutterBottom>
         Данные клиента
       </Typography>

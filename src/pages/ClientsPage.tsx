@@ -11,107 +11,48 @@ import {
   Paper,
   Container,
 } from "@mui/material";
-import { useSearchParams } from "react-router-dom"; // <-- для работы с query
+import { useSearchParams } from "react-router-dom"; // для работы с query
 import { useClients } from "../contexts/ClientsContext";
+
+import {
+  calculateMonthlyCounts,
+  filterClientsByMonth,
+} from "../utils/clientsUtils";
 import { RenderClientsForDate } from "../components/renderClientsForDate";
 
 export const ClientsPage: React.FC = () => {
   const { clients } = useClients();
-
   const [filteredClients, setFilteredClients] = useState<Record<string, any[]>>(
     {}
   );
+  const [dropdownItems, setDropdownItems] = useState<any[]>([]);
 
-  // Подготовим state для выбранного месяца
-  // Но инициализируем его из query-параметра:
+  // Инициализация selectedMonth из query-параметра
   const [searchParams, setSearchParams] = useSearchParams();
   const initialMonth = searchParams.get("month") || "";
   const [selectedMonth, setSelectedMonth] = useState<string>(initialMonth);
 
-  const [dropdownItems, setDropdownItems] = useState<any[]>([]);
-
-  // При изменении списка клиентов — пересчитываем месяцы
+  // При изменении списка клиентов — пересчитываем выпадающий список
   useEffect(() => {
     if (clients.length) {
-      calculateMonthlyCounts(clients);
+      const items = calculateMonthlyCounts(clients);
+      setDropdownItems(items);
     }
   }, [clients]);
 
   // При изменении selectedMonth — сохраняем в URL и фильтруем
   useEffect(() => {
     if (selectedMonth) {
-      // Устанавливаем ?month=selectedMonth
       searchParams.set("month", selectedMonth);
       setSearchParams(searchParams);
-      filterClientsByMonth(clients, selectedMonth);
+      const filtered = filterClientsByMonth(clients, selectedMonth);
+      setFilteredClients(filtered);
     } else {
-      // Если пользователь очистил фильтр
       searchParams.delete("month");
       setSearchParams(searchParams);
       setFilteredClients({});
     }
-  }, [selectedMonth, clients]);
-
-  // Считаем, сколько клиентов на каждый месяц (для выпадающего списка)
-  const calculateMonthlyCounts = (clientsData: any[]) => {
-    const counts: Record<string, number> = {};
-
-    clientsData.forEach((client) => {
-      const date = client["Дата планируемого ТО"] || client["Дата ТО"];
-      if (date) {
-        const clientMonth = new Date(date).toISOString().slice(0, 7);
-        counts[clientMonth] = (counts[clientMonth] || 0) + 1;
-      }
-    });
-
-    // Превращаем в массив для Select
-    const items = Object.keys(counts)
-      .sort()
-      .map((month) => {
-        const [year, monthNumber] = month.split("-");
-        const monthName = new Date(
-          parseInt(year, 10),
-          parseInt(monthNumber, 10) - 1
-        ).toLocaleString("ru-RU", { month: "long" });
-        return {
-          label: `${
-            monthName.charAt(0).toUpperCase() + monthName.slice(1)
-          } ${year} (${counts[month]})`,
-          value: month,
-        };
-      });
-
-    setDropdownItems(items);
-  };
-
-  // Фильтруем клиентов по выбранному месяцу
-  const filterClientsByMonth = (clientsData: any[], month: string) => {
-    const groupedClients: Record<string, any[]> = {};
-
-    clientsData.forEach((client) => {
-      const date = client["Дата планируемого ТО"] || client["Дата ТО"];
-      if (date) {
-        const formattedDate = new Date(date).toISOString().split("T")[0];
-        const clientMonth = formattedDate.slice(0, 7);
-        if (clientMonth === month) {
-          if (!groupedClients[formattedDate]) {
-            groupedClients[formattedDate] = [];
-          }
-          groupedClients[formattedDate].push(client);
-        }
-      }
-    });
-
-    // Сортируем даты по возрастанию
-    const sorted = Object.keys(groupedClients)
-      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-      .reduce<Record<string, any[]>>((acc, date) => {
-        acc[date] = groupedClients[date];
-        return acc;
-      }, {});
-
-    setFilteredClients(sorted);
-  };
+  }, [selectedMonth, clients, searchParams, setSearchParams]);
 
   return (
     <Container sx={{ my: 4 }}>
@@ -146,3 +87,5 @@ export const ClientsPage: React.FC = () => {
     </Container>
   );
 };
+
+export default ClientsPage;
